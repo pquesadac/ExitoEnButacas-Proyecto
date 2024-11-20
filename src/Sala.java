@@ -81,7 +81,40 @@ public class Sala {
         }
         return false;
     }
+
     //timeout
+    
+    public boolean timeoutReserva(Usuario usuario, int idAsientos) {
+
+        if (rifaEnCurso) {
+            return false;
+        }
+
+        List<Asiento> listaAsientos = asientos.get(usuario);
+        if (listaAsientos != null) {
+            for (Asiento asiento : listaAsientos) {
+                if (asiento.getId() == idAsientos && asiento.getEstado() != EstadoAsiento.RESERVADO) {
+                    new  Thread(() -> {
+                        try {
+                            Thread.sleep(60000);
+                            if (asiento.getEstado() == EstadoAsiento.RESERVADO) {
+                                asiento.setEstado(EstadoAsiento.LIBRE);
+                                asiento.setTiempoReserva(null);
+                                asiento.setUsuarioReservado(null);
+                                System.out.println("Asiento " + idAsientos + " ya no esta reservado");
+
+                            }
+                        }catch (Exception e) {
+                            System.out.println(e.getMessage());
+                        }
+                    }).start();
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
     public boolean iniciarRifa() {
         rifaEnCurso = true;
         List<Asiento> asientosVendidos = new ArrayList<>();
