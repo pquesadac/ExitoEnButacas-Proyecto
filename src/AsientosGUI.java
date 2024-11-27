@@ -16,6 +16,10 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import javax.swing.ListSelectionModel;
 
+/**
+ * Modela la interfaz gráfica representativa de los asientos de una sala de
+ * cine.
+ */
 public class AsientosGUI extends JFrame {
 
     private JButton jbCancelarReserva;
