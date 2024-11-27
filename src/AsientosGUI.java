@@ -14,6 +14,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import javax.swing.ListSelectionModel;
 
 public class AsientosGUI extends JFrame {
 
@@ -29,9 +30,12 @@ public class AsientosGUI extends JFrame {
     // Constructor
     public AsientosGUI() {
         initComponents();
-        
+
+        jtAsientos.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        jtAsientos.setCellSelectionEnabled(true);
         // Add ActionListener to the "Comprar" button (jbReservar)
-        jbReservar.addActionListener(e -> reservarAsiento());
+        jbReservar.addActionListener(e -> reservarAsiento()); // 
+        jbCancelarReserva.addActionListener(e -> cancelarReserva());
     }
 
     private void initComponents() {
@@ -102,9 +106,9 @@ public class AsientosGUI extends JFrame {
                 label.setHorizontalAlignment(JLabel.CENTER);  // Horizontal centering
                 label.setVerticalAlignment(JLabel.CENTER);    // Vertical centering
 
-                // Check if this cell is the selected one, apply a green border only if true
-                if (table.getSelectedRow() == row && table.getSelectedColumn() == column) {
-                    label.setBorder(BorderFactory.createLineBorder(Color.GREEN, 3));  // Green border for selected cell
+                // Highlight all selected cells with a green border
+                if (table.isCellSelected(row, column)) {
+                    label.setBorder(BorderFactory.createLineBorder(Color.GREEN, 3));  // Green border for selected cells
                 } else {
                     label.setBorder(null);  // No border for non-selected cells
                 }
@@ -138,7 +142,9 @@ public class AsientosGUI extends JFrame {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
 
-        // Auto-resize components when the window size changes
+        /* Cambiar automáticamente el tamaño de los componentes cuando varíe el
+         * tamaño de la ventana.
+         */
         layout.setHorizontalGroup(
                 layout.createSequentialGroup()
                         .addContainerGap()
@@ -164,7 +170,9 @@ public class AsientosGUI extends JFrame {
 
         pack();
 
-        // Add a ComponentListener to adjust row height when the window is resized
+        /* Añadir un ComponentListener para ajustar la altura de las filas de la
+         * tabla cuando cambie el tamaño de la tabla.
+         */
         this.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
@@ -173,37 +181,48 @@ public class AsientosGUI extends JFrame {
         });
     }
 
-    // Method to adjust row height based on the table container's height
+    /**
+     * Ajusta la altura de las filas de forma dinámica.
+     */
     private void adjustRowHeight() {
         int rowCount = jtAsientos.getRowCount();
         int tableHeight = jspAsientos.getViewport().getHeight(); // Get the height of the visible area of the table
         int rowHeight = tableHeight / rowCount; // Divide the height by the number of rows
 
-        // Set the row height for all rows
+        /* Establecer la altura de las filas.
+         */
         jtAsientos.setRowHeight(rowHeight);
     }
 
+    /**
+     * Establece el asiento seleccionado como ocupado.
+     */
     private void reservarAsiento() {
-        // Get the selected row and column from the JTable
-        int selectedRow = jtAsientos.getSelectedRow();
-        int selectedColumn = jtAsientos.getSelectedColumn();
-        
-        // Check if a valid seat is selected (i.e., not a header or invalid selection)
-        if (selectedRow != -1 && selectedColumn != -1) {
-            // Get the current value (image) in the selected cell
-            Object currentValue = jtAsientos.getValueAt(selectedRow, selectedColumn);
-            
-            // If the seat is free (ASIENTO_LIBRE), change it to ASIENTO_OCUPADO
-            if (currentValue instanceof ImageIcon && currentValue.equals(ASIENTO_LIBRE)) {
-                jtAsientos.setValueAt(ASIENTO_OCUPADO, selectedRow, selectedColumn); // Update the seat image to occupied
+        int[] selectedRows = jtAsientos.getSelectedRows();
+        int[] selectedColumns = jtAsientos.getSelectedColumns();
+
+        for (int row : selectedRows) {
+            for (int col : selectedColumns) {
+                Object currentValue = jtAsientos.getValueAt(row, col);
+                if (currentValue instanceof ImageIcon && currentValue.equals(ASIENTO_LIBRE)) {
+                    jtAsientos.setValueAt(ASIENTO_OCUPADO, row, col);
+                }
             }
         }
     }
 
-    // Main method to launch the application
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(() -> {
-            new AsientosGUI().setVisible(true);
-        });
+    private void cancelarReserva() {
+        int[] selectedRows = jtAsientos.getSelectedRows();
+        int[] selectedColumns = jtAsientos.getSelectedColumns();
+
+        for (int row : selectedRows) {
+            for (int col : selectedColumns) {
+                Object currentValue = jtAsientos.getValueAt(row, col);
+                if (currentValue instanceof ImageIcon && currentValue.equals(ASIENTO_OCUPADO)) {
+                    jtAsientos.setValueAt(ASIENTO_LIBRE, row, col);
+                }
+            }
+        }
     }
+
 }
