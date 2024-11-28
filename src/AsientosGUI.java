@@ -30,6 +30,7 @@ public class AsientosGUI extends JFrame {
     private static final String FS = File.separator;
     private static final ImageIcon ASIENTO_LIBRE = new ImageIcon("." + FS + "assets" + FS + "asiento_libre.jpg");
     private static final ImageIcon ASIENTO_OCUPADO = new ImageIcon("." + FS + "assets" + FS + "asiento_ocupado.jpg");
+    private static final ImageIcon ASIENTO_RESERVADO = new ImageIcon("." + FS + "assets" + FS + "asiento_reservado.jpg");
 
     // Constructor
     public AsientosGUI() {
@@ -209,7 +210,7 @@ private void reservarAsiento() {
         for (int col : selectedColumns) {
             Object currentValue = jtAsientos.getValueAt(row, col);
             if (currentValue instanceof ImageIcon && currentValue.equals(ASIENTO_LIBRE)) {
-                jtAsientos.setValueAt(ASIENTO_OCUPADO, row, col);
+                jtAsientos.setValueAt(ASIENTO_RESERVADO, row, col);
                 numAsientos++; 
             }
         }
@@ -224,16 +225,30 @@ private void reservarAsiento() {
     }
 }
 
-public void restaurarColorAsientos() {
+
+public void liberarAsientosReservados() {
     for (int row = 0; row < jtAsientos.getRowCount(); row++) {
         for (int col = 0; col < jtAsientos.getColumnCount(); col++) {
             Object currentValue = jtAsientos.getValueAt(row, col);
-            if (currentValue instanceof ImageIcon && currentValue.equals(ASIENTO_OCUPADO)) {
+            if (currentValue instanceof ImageIcon && currentValue.equals(ASIENTO_RESERVADO)) {
                 jtAsientos.setValueAt(ASIENTO_LIBRE, row, col); 
             }
         }
     }
 }
+
+
+public void marcarAsientosComoOcupados() {
+    for (int row = 0; row < jtAsientos.getRowCount(); row++) {
+        for (int col = 0; col < jtAsientos.getColumnCount(); col++) {
+            Object currentValue = jtAsientos.getValueAt(row, col);
+            if (currentValue instanceof ImageIcon && currentValue.equals(ASIENTO_RESERVADO)) {
+                jtAsientos.setValueAt(ASIENTO_OCUPADO, row, col); 
+            }
+        }
+    }
+}
+
 
 
     private void cancelarReserva() {

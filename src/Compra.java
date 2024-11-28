@@ -107,6 +107,7 @@ public class Compra extends JDialog {
                 btn_pagar.setActionCommand("OK");
                 btn_pagar.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
+                        asientosGUI.marcarAsientosComoOcupados();
                         dispose();  
                     }
                 });
@@ -117,7 +118,7 @@ public class Compra extends JDialog {
                 JButton btn_cancelar = new JButton("Cancelar");
                 btn_cancelar.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        asientosGUI.restaurarColorAsientos();
+                        asientosGUI.liberarAsientosReservados();
                         dispose();
                     }
                 });
