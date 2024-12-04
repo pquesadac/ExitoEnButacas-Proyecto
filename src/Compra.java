@@ -1,3 +1,5 @@
+package com.mycompany.iniciogui;
+
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 
@@ -12,22 +14,22 @@ import java.io.File;
 
 import javax.swing.JTextField;
 import java.awt.Color;
+import java.awt.SystemColor;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.SwingConstants;
-import java.awt.SystemColor;
-import javax.swing.JToggleButton;
 
 public class Compra extends JDialog {
 
     private static final long serialVersionUID = 1L;
     private JPanel contentPanel = new JPanel();
-    private JLabel lblPrecioTotal;
+    private JTextField txt_precio; 
+    private JPanel panel;
     private AsientosGUI asientosGUI;
-    private int cantidadAsientos = 0;
-    private double precioTotal = 0.0;
-    private final int precioAsiento = 5;
-    private String precioTotalString = "";
+    private int cantidad_asientos = 0; 
+    private double precio_total = 0.0; 
+    private final int precio_asiento = 5; 
+    private JLabel lblCantidadAsientos;
 
     private static final String FS = File.separator;
     private static final ImageIcon CARRITO = new ImageIcon("." + FS + "assets" + FS + "carrito.png");
@@ -55,69 +57,74 @@ public class Compra extends JDialog {
         lblCesta.setBounds(152, 10, 210, 34);
         contentPanel.add(lblCesta);
 
-        String precio = String.valueOf(precioAsiento);
-        String cantidadAsientosString = String.valueOf(cantidadAsientos);
-        
-        JLabel lblCantidadAsientos = new JLabel(cantidadAsientosString + " (" + precioAsiento + "€ por asiento)");
+        // Inicializa la etiqueta de cantidad de asientos
+        lblCantidadAsientos = new JLabel(cantidad_asientos + " (" + precio_asiento + "€ por asiento)");
         lblCantidadAsientos.setBounds(41, 168, 210, 52);
         contentPanel.add(lblCantidadAsientos);
         lblCantidadAsientos.setFont(new Font("Book Antiqua", Font.PLAIN, 16));
+
+        precio_total = cantidad_asientos * precio_asiento; 
         
-        precioTotalString = String.valueOf(precioTotal);
-        
-        lblPrecioTotal = new JLabel(precioTotalString + " €");
-        lblPrecioTotal.setHorizontalAlignment(SwingConstants.RIGHT);
-        lblPrecioTotal.setFont(new Font("Book Antiqua", Font.PLAIN, 16));
-        lblPrecioTotal.setBounds(361, 168, 112, 52);
-        contentPanel.add(lblPrecioTotal);
-        
-        JPanel panel = new JPanel();
+        txt_precio = new JTextField(String.valueOf(precio_total) + " €");
+        txt_precio.setEditable(false);
+        txt_precio.setFont(new Font("Book Antiqua", Font.PLAIN, 16));
+        txt_precio.setBounds(361, 178, 112, 27);
+        contentPanel.add(txt_precio);
+
+        panel = new JPanel();
         panel.setBackground(SystemColor.inactiveCaption);
         panel.setBounds(31, 181, 450, 27);
         contentPanel.add(panel);
-        
+
         JLabel lblAsientos = new JLabel("Asientos:");
         lblAsientos.setFont(new Font("Serif", Font.PLAIN, 12));
         lblAsientos.setBounds(31, 158, 134, 13);
         contentPanel.add(lblAsientos);
-        
+
         JLabel lblTotal = new JLabel("Total:");
         lblTotal.setHorizontalAlignment(SwingConstants.RIGHT);
         lblTotal.setFont(new Font("Serif", Font.PLAIN, 12));
         lblTotal.setBounds(347, 158, 126, 13);
         contentPanel.add(lblTotal);
 
-        {
-            JPanel buttonPane = new JPanel();
-            buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
-            getContentPane().add(buttonPane, BorderLayout.SOUTH);
-            {
-                JButton btn_pagar = new JButton("Pagar");
-                btn_pagar.setActionCommand("OK");
-                btn_pagar.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        asientosGUI.marcarAsientosComoOcupados();
-                        dispose();  
-                    }
-                });
-                buttonPane.add(btn_pagar);
-                getRootPane().setDefaultButton(btn_pagar);
+        JPanel buttonPane = new JPanel();
+        buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        getContentPane().add(buttonPane, BorderLayout.SOUTH);
+
+        JButton btn_pagar = new JButton("Pagar");
+        btn_pagar.setActionCommand("OK");
+        btn_pagar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                asientosGUI.marcarAsientosComoOcupados();
+                dispose();
             }
-            {
-                JButton btn_cancelar = new JButton("Cancelar");
-                btn_cancelar.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        asientosGUI.liberarAsientosReservados();
-                        dispose();
-                    }
-                });
-                btn_cancelar.setActionCommand("Cancel");
-                buttonPane.add(btn_cancelar);
+        });
+        buttonPane.add(btn_pagar);
+        getRootPane().setDefaultButton(btn_pagar);
+
+        JButton btn_cancelar = new JButton("Cancelar");
+        btn_cancelar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                asientosGUI.liberarAsientosReservados();
+                dispose();
             }
-        }
+        });
+        btn_cancelar.setActionCommand("Cancel");
+        buttonPane.add(btn_cancelar);
     }
 
+    // Método para actualizar la cantidad de asientos y el total
+   public void actualizarCantidadAsientos(int cantidad) {
+        this.cantidad_asientos = cantidad;
+        // Actualiza la etiqueta de cantidad de asientos
+        lblCantidadAsientos.setText(cantidad_asientos + " (" + precio_asiento + "€ por asiento)");
+        // Recalcula el precio total
+        precio_total = cantidad_asientos * precio_asiento;
+        txt_precio.setText(String.valueOf(precio_total) + " €");
+    }
+
+    // Actualiza el total (si es necesario)
     public void actualizarTotal(int total) {
-    	lblPrecioTotal.setText(String.valueOf(total));
+        txt_precio.setText("$" + total);
     }
 }
