@@ -1,5 +1,3 @@
-package com.mycompany.iniciogui;
-
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 
@@ -31,6 +29,8 @@ public class Compra extends JDialog {
     private final int precio_asiento = 5; 
     private JLabel lblCantidadAsientos;
 
+    private TimerReserva timerReserva;
+
     private static final String FS = File.separator;
     private static final ImageIcon CARRITO = new ImageIcon("." + FS + "assets" + FS + "carrito.png");
 
@@ -39,6 +39,10 @@ public class Compra extends JDialog {
      */
     public Compra(AsientosGUI asientosGUI) {
         this.asientosGUI = asientosGUI;
+
+        this.timerReserva = new TimerReserva(asientosGUI, 3); // Cambiar segundos 
+        this.timerReserva.start(); // Iniciar temporizador al abrir la ventana
+                
         setBounds(100, 100, 526, 298);
         getContentPane().setLayout(new BorderLayout());
         contentPanel.setBackground(new Color(192, 192, 192));

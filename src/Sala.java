@@ -7,16 +7,21 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Sala {
     private ConcurrentHashMap<Usuario, List<Asiento>> asientos;
     private boolean rifaEnCurso = false;
+    
     public ConcurrentHashMap<Usuario, List<Asiento>> getAsientos() {
         return asientos;
     }
+
     public void setAsientos(ConcurrentHashMap<Usuario, List<Asiento>> asientos) {
         this.asientos = asientos;
     }
+
     public boolean reservarAsientos(Usuario usuario, List<Integer> idAsientos) {
+        
         if (rifaEnCurso) {
             return false;
         }
+
         List<Asiento> listaAsientosDisponibles = new ArrayList<>();
         for (List<Asiento> listaAsientos : asientos.values()) {
             for (Asiento asiento : listaAsientos) {
@@ -26,16 +31,20 @@ public class Sala {
                 listaAsientos.add(asiento);
             }
         }
+
         for (Asiento asiento : listaAsientosDisponibles) {
             asiento.setEstado(EstadoAsiento.RESERVADO);
             asiento.setUsuarioReservado(usuario);
             asiento.setTiempoReserva(LocalDateTime.now());
         }
+
         asientos.putIfAbsent(usuario,new ArrayList<>());
         asientos.get(usuario).addAll(listaAsientosDisponibles);
         return true;
+
     }
-    //comprar asiento
+
+    // comprar asiento
 
     public boolean comprarAsientos(Usuario usuario, int idAsientos) {
 
@@ -58,7 +67,7 @@ public class Sala {
 
     }
 
-    //cancelar asiento
+    // cancelar asiento
 
     public boolean cancelarAsientos(Usuario usuario, int idAsientos) {
 
@@ -82,7 +91,7 @@ public class Sala {
         return false;
     }
 
-    //timeout
+    // timeout
     
     public boolean timeoutReserva(Usuario usuario, int idAsientos) {
 

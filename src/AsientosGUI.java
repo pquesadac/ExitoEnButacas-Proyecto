@@ -4,6 +4,7 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JButton;
 import java.awt.Component;
@@ -24,6 +25,8 @@ public class AsientosGUI extends JFrame {
     private JScrollPane jspAsientos;
     private JTable jtAsientos;
 
+    private Compra ventanaCompra;
+
     private static final String FS = File.separator;
     private static final ImageIcon ASIENTO_LIBRE = new ImageIcon("." + FS + "assets" + FS + "asiento_libre.jpg");
     private static final ImageIcon ASIENTO_OCUPADO = new ImageIcon("." + FS + "assets" + FS + "asiento_ocupado.jpg");
@@ -34,6 +37,7 @@ public class AsientosGUI extends JFrame {
         initComponents();
         jtAsientos.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         jtAsientos.setCellSelectionEnabled(true);
+        
         // Add ActionListener to the "Comprar" button (jbReservar)
         jbReservar.addActionListener(e -> reservarAsiento()); // 
         jbCancelarReserva.addActionListener(e -> cancelarReserva());
@@ -185,6 +189,7 @@ public class AsientosGUI extends JFrame {
     /**
      * Ajusta la altura de las filas de forma dinámica.
      */
+
     private void adjustRowHeight() {
         int rowCount = jtAsientos.getRowCount();
         int tableHeight = jspAsientos.getViewport().getHeight(); // Get the height of the visible area of the table
@@ -198,55 +203,57 @@ public class AsientosGUI extends JFrame {
     /**
      * Establece el asiento seleccionado como ocupado.
      */
-private void reservarAsiento() {
-    int[] selectedRows = jtAsientos.getSelectedRows();
-    int[] selectedColumns = jtAsientos.getSelectedColumns();
-    int numAsientos = 0; 
+    
+    private void reservarAsiento() {
+        int cantidadSeleccionada = 0;
 
-    for (int row : selectedRows) {
-        for (int col : selectedColumns) {
-            Object currentValue = jtAsientos.getValueAt(row, col);
-            if (currentValue instanceof ImageIcon && currentValue.equals(ASIENTO_LIBRE)) {
-                jtAsientos.setValueAt(ASIENTO_RESERVADO, row, col);
-                numAsientos++; 
+        for (int i = 0; i < jtAsientos.getRowCount(); i++) {
+            for (int j = 0; j < jtAsientos.getColumnCount(); j++) {
+                if (jtAsientos.isCellSelected(i, j)) { 
+                    if (jtAsientos.getValueAt(i, j) == ASIENTO_LIBRE) { 
+                        jtAsientos.setValueAt(ASIENTO_RESERVADO, i, j); 
+                        cantidadSeleccionada++;
+                    }
+                }
+            }
+        }
+
+        if (cantidadSeleccionada > 0) {
+            Compra compra = new Compra(this);
+            compra.actualizarCantidadAsientos(cantidadSeleccionada); 
+            compra.setVisible(true);
+        } else {
+            JOptionPane.showMessageDialog(this, "Por favor, selecciona al menos un asiento.");
+        }
+    }
+
+
+    public void liberarAsientosReservados() {
+        for (int row = 0; row < jtAsientos.getRowCount(); row++) {
+            for (int col = 0; col < jtAsientos.getColumnCount(); col++) {
+                Object currentValue = jtAsientos.getValueAt(row, col);
+                if (currentValue instanceof ImageIcon && currentValue.equals(ASIENTO_RESERVADO)) {
+                    jtAsientos.setValueAt(ASIENTO_LIBRE, row, col); 
+                }
             }
         }
     }
 
-    if (numAsientos > 0) {
-        Compra ventanaCompra = new Compra(this);
-        ventanaCompra.setVisible(true);
-        ventanaCompra.actualizarTotal(numAsientos * 5); 
-    } else {
-        System.out.println("No ha seleccionado ningún asiento.");
-    }
-}
 
-
-public void liberarAsientosReservados() {
-    for (int row = 0; row < jtAsientos.getRowCount(); row++) {
-        for (int col = 0; col < jtAsientos.getColumnCount(); col++) {
-            Object currentValue = jtAsientos.getValueAt(row, col);
-            if (currentValue instanceof ImageIcon && currentValue.equals(ASIENTO_RESERVADO)) {
-                jtAsientos.setValueAt(ASIENTO_LIBRE, row, col); 
+    public void marcarAsientosComoOcupados() {
+        for (int row = 0; row < jtAsientos.getRowCount(); row++) {
+            for (int col = 0; col < jtAsientos.getColumnCount(); col++) {
+                Object currentValue = jtAsientos.getValueAt(row, col);
+                if (currentValue instanceof ImageIcon && currentValue.equals(ASIENTO_RESERVADO)) {
+                    jtAsientos.setValueAt(ASIENTO_OCUPADO, row, col); 
+                }
             }
         }
     }
-}
 
-
-public void marcarAsientosComoOcupados() {
-    for (int row = 0; row < jtAsientos.getRowCount(); row++) {
-        for (int col = 0; col < jtAsientos.getColumnCount(); col++) {
-            Object currentValue = jtAsientos.getValueAt(row, col);
-            if (currentValue instanceof ImageIcon && currentValue.equals(ASIENTO_RESERVADO)) {
-                jtAsientos.setValueAt(ASIENTO_OCUPADO, row, col); 
-            }
-        }
-    }
-}
-
-
+    public void setVentanaCompra (Compra ventanaCompra) {
+		this.ventanaCompra = ventanaCompra;
+	}
 
     private void cancelarReserva() {
         int[] selectedRows = jtAsientos.getSelectedRows();
