@@ -1,5 +1,3 @@
-package com.mycompany.iniciogui;
-
 import java.io.File;
 import javax.swing.ImageIcon;
 import javax.swing.JTable;
@@ -17,7 +15,6 @@ import javax.swing.JFrame;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import javax.swing.ListSelectionModel;
-import com.mycompany.iniciogui.Compra;
 
 
 public class AsientosGUI extends JFrame {
