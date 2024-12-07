@@ -1,3 +1,6 @@
+package com.mycompany.iniciogui;
+
+import com.mycompany.iniciogui.Compra;
 import java.io.File;
 import javax.swing.ImageIcon;
 import javax.swing.JTable;
@@ -16,6 +19,7 @@ import javax.swing.JFrame;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import javax.swing.ListSelectionModel;
+import javax.swing.Timer;
 
 
 public class AsientosGUI extends JFrame {
@@ -24,6 +28,8 @@ public class AsientosGUI extends JFrame {
     private JButton jbReservar;
     private JScrollPane jspAsientos;
     private JTable jtAsientos;
+    private Timer inicioPeliculaTimer;
+    private Timer finPeliculaTimer;
 
     private Compra ventanaCompra;
 
@@ -41,8 +47,34 @@ public class AsientosGUI extends JFrame {
         // Add ActionListener to the "Comprar" button (jbReservar)
         jbReservar.addActionListener(e -> reservarAsiento()); // 
         jbCancelarReserva.addActionListener(e -> cancelarReserva());
+        configuracionTemporizadores();
     }
 
+    
+    private void configuracionTemporizadores() {
+        inicioPeliculaTimer = new Timer(20 * 1000, e -> {
+            JOptionPane.showMessageDialog(this, "La película ha comenzado. No se pueden comprar mas asientos.");
+            setInteraccion(false);
+        });
+
+        finPeliculaTimer = new Timer(30 * 1000, e -> {
+            JOptionPane.showMessageDialog(this, "La película ha terminado. Puedes seleccionar asientos nuevamente.");
+            setInteraccion(true);
+        });
+
+        // Iniciamos los temporizadores
+        inicioPeliculaTimer.setRepeats(false);
+        finPeliculaTimer.setRepeats(false);
+        inicioPeliculaTimer.start();
+        finPeliculaTimer.start();
+    }
+
+    private void setInteraccion(boolean habilitado) {
+        jbReservar.setEnabled(habilitado);
+        jbCancelarReserva.setEnabled(habilitado);
+        jtAsientos.setEnabled(habilitado);
+    }
+    
     private void initComponents() {
         jspAsientos = new javax.swing.JScrollPane();
         jtAsientos = new JTable();
@@ -263,6 +295,7 @@ public class AsientosGUI extends JFrame {
                 Object currentValue = jtAsientos.getValueAt(row, col);
                 if (currentValue instanceof ImageIcon && currentValue.equals(ASIENTO_OCUPADO)) {
                     jtAsientos.setValueAt(ASIENTO_LIBRE, row, col);
+                    JOptionPane.showMessageDialog(rootPane,"Asientos cancelados, El dinero se ha enviado a tu cuenta");
                 }
             }
         }
