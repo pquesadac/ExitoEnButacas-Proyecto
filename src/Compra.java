@@ -41,6 +41,7 @@ public class Compra extends JDialog {
         this.asientosGUI = asientosGUI;
 
         this.timerReserva = new TimerReserva(asientosGUI, 3); // Cambiar segundos 
+        this.timerReserva.setCompra(this); // Asignar la referencia de esta ventana
         this.timerReserva.start(); // Iniciar temporizador al abrir la ventana
                 
         setBounds(100, 100, 526, 298);
