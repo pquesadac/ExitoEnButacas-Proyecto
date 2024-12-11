@@ -30,6 +30,7 @@ public class AsientosGUI extends JFrame {
     private JTable jtAsientos;
     private Timer inicioPeliculaTimer;
     private Timer finPeliculaTimer;
+    private Usuario usuario;
 
     private Compra ventanaCompra;
 
@@ -39,15 +40,16 @@ public class AsientosGUI extends JFrame {
     private static final ImageIcon ASIENTO_RESERVADO = new ImageIcon("." + FS + "assets" + FS + "asiento_reservado.jpg");
 
     // Constructor
-    public AsientosGUI() {
+     public AsientosGUI(Usuario usuario) {
         initComponents();
         jtAsientos.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         jtAsientos.setCellSelectionEnabled(true);
-        
+
         // Add ActionListener to the "Comprar" button (jbReservar)
         jbReservar.addActionListener(e -> reservarAsiento()); // 
         jbCancelarReserva.addActionListener(e -> cancelarReserva());
         configuracionTemporizadores();
+        setTitle("Selección de Asientos - " + usuario.getNombre());
     }
 
     
