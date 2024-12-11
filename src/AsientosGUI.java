@@ -32,6 +32,7 @@ public class AsientosGUI extends JFrame {
 
     private Compra ventanaCompra;
     private Sala sala;
+    private Usuario usuario;
 
     private static final String FS = File.separator;
     private static final ImageIcon ASIENTO_LIBRE = new ImageIcon("." + FS + "assets" + FS + "asiento_libre.jpg");
@@ -39,7 +40,7 @@ public class AsientosGUI extends JFrame {
     private static final ImageIcon ASIENTO_RESERVADO = new ImageIcon("." + FS + "assets" + FS + "asiento_reservado.jpg");
 
     // Constructor
-    public AsientosGUI(Sala sala) {
+    public AsientosGUI(Sala sala, Usuario usuario) {
     	this.sala = sala;
         initComponents();
         jtAsientos.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -48,6 +49,7 @@ public class AsientosGUI extends JFrame {
         jbReservar.addActionListener(e -> reservarAsiento());
         jbCancelarReserva.addActionListener(e -> cancelarReserva());
         configuracionTemporizadores();
+        setTitle("Selección de Asientos - " + usuario.getNombre());
     }
 
     private void configuracionTemporizadores() {
@@ -257,7 +259,7 @@ public class AsientosGUI extends JFrame {
     }
 
     public void marcarAsientosComoOcupados() {
-        Usuario usuario = new Usuario(); // Puedes usar un usuario real en tu flujo
+        Usuario usuario = new Usuario(); 
         usuario.setId(1); // ID estático para pruebas
         usuario.setNombre("Usuario Prueba");
 

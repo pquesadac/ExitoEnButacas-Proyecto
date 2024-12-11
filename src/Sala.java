@@ -8,7 +8,7 @@ public class Sala {
 
     // Constructor
     public Sala() {
-        this.asientos = new ConcurrentHashMap<>(); // Inicializamos el mapa
+        this.asientos = new ConcurrentHashMap<>(); 
     }
     
     public ConcurrentHashMap<Usuario, List<Asiento>> getAsientos() {

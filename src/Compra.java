@@ -34,9 +34,6 @@ public class Compra extends JDialog {
     private static final String FS = File.separator;
     private static final ImageIcon CARRITO = new ImageIcon("." + FS + "assets" + FS + "carrito.png");
 
-    /**
-     * Create the dialog.
-     */
     public Compra(AsientosGUI asientosGUI) {
         this.asientosGUI = asientosGUI;
 

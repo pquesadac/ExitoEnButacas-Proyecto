@@ -41,7 +41,7 @@ public class TimerReserva {
         if (compra != null) {
             compra.dispose(); // Cierra la ventana de compra
         }
-        asientosGUI.setVisible(true); // Asegúrate de que la GUI principal esté visible
+        asientosGUI.setVisible(true); 
     }
 }
 
