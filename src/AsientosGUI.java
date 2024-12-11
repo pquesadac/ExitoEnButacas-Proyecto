@@ -51,7 +51,7 @@ public class AsientosGUI extends JFrame {
     }
 
     
-    private void configuracionTemporizadores() {
+        private void configuracionTemporizadores() {
         inicioPeliculaTimer = new Timer(20 * 1000, e -> {
             JOptionPane.showMessageDialog(this, "La película ha comenzado. No se pueden comprar mas asientos.");
             setInteraccion(false);
@@ -60,13 +60,24 @@ public class AsientosGUI extends JFrame {
         finPeliculaTimer = new Timer(30 * 1000, e -> {
             JOptionPane.showMessageDialog(this, "La película ha terminado. Puedes seleccionar asientos nuevamente.");
             setInteraccion(true);
+            resetearAsientosOcupados();
         });
 
-        // Iniciamos los temporizadores
         inicioPeliculaTimer.setRepeats(false);
         finPeliculaTimer.setRepeats(false);
         inicioPeliculaTimer.start();
         finPeliculaTimer.start();
+    }
+
+    private void resetearAsientosOcupados() {
+        for (int row = 0; row < jtAsientos.getRowCount(); row++) {
+            for (int col = 0; col < jtAsientos.getColumnCount(); col++) {
+                Object currentValue = jtAsientos.getValueAt(row, col);
+                if (currentValue instanceof ImageIcon && currentValue.equals(ASIENTO_OCUPADO)) {
+                    jtAsientos.setValueAt(ASIENTO_LIBRE, row, col);
+                }
+            }
+        }
     }
 
     private void setInteraccion(boolean habilitado) {
