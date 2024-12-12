@@ -23,15 +23,17 @@ public class Usuario {
 
     @Override
     public boolean equals(Object o) {
+        if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Usuario usuario = (Usuario) o;
-        return id == usuario.id && Objects.equals(nombre, usuario.nombre);
+        return id == usuario.id; // La comparación se basa únicamente en el ID
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, nombre);
+        return Objects.hash(id); // El hashCode también se basa únicamente en el ID
     }
+
 
     @Override
     public String toString() {
@@ -41,3 +43,5 @@ public class Usuario {
                 '}';
     }
 }
+
+

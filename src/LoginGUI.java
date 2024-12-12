@@ -1,5 +1,7 @@
 import java.awt.Font;
 import java.awt.SystemColor;
+import java.util.ArrayList;
+
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -13,7 +15,7 @@ public class LoginGUI extends JFrame {
     private static final long serialVersionUID = 1L;
     private JPanel contentPane;
     private JTextField txtID;
-    private JTextField txtPassword;
+    private JTextField txtName;
     private Sala sala;
     public LoginGUI() {
     	this.sala = new Sala();
@@ -31,71 +33,74 @@ public class LoginGUI extends JFrame {
         lblLoginTitle.setBounds(104, 30, 197, 47);
         contentPane.add(lblLoginTitle);
         txtID = new JTextField();
-        txtID.setText("  DNI/NIE");
+        txtID.setText("  ID");
         txtID.setBounds(53, 175, 305, 35);
         contentPane.add(txtID);
         txtID.setColumns(10);
-        txtPassword = new JTextField();
-        txtPassword.setText("  Contraseña");
-        txtPassword.setColumns(10);
-        txtPassword.setBounds(53, 233, 305, 35);
-        contentPane.add(txtPassword);
+        txtName = new JTextField();
+        txtName.setText("  Nombre");
+        txtName.setColumns(10);
+        txtName.setBounds(53, 233, 305, 35);
+        contentPane.add(txtName);
         JButton btnAcceso = new JButton("ACCEDER");
         btnAcceso.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 18));
         btnAcceso.setBounds(138, 316, 134, 35);
         contentPane.add(btnAcceso);
-         btnAcceso.addActionListener(e -> {
+        btnAcceso.addActionListener(e -> {
             if (validateLogin()) {
                 Usuario usuario = new Usuario();
-                usuario.setId(Integer.parseInt(txtID.getText().trim())); 
-                usuario.setNombre(txtID.getText().trim()); 
-                
+                usuario.setId(Integer.parseInt(txtID.getText().trim())); // Obtén el ID del campo
+                usuario.setNombre(txtName.getText().trim()); // Obtén el nombre del campo
+
+                sala.getAsientos().putIfAbsent(usuario, new ArrayList<>()); // Registra usuario en la sala
+
                 AsientosGUI asientosGUI = new AsientosGUI(sala, usuario);
                 asientosGUI.setVisible(true);
-                dispose(); 
+                dispose(); // Cierra la ventana de login
             }
         });
+
         addPlaceholderBehavior();
     }
   private void addPlaceholderBehavior() {
         txtID.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
-                if (txtID.getText().equals("  DNI/NIE")) {
+                if (txtID.getText().equals("  ID")) {
                     txtID.setText("");
                 }
             }
             public void focusLost(java.awt.event.FocusEvent evt) {
                 if (txtID.getText().isEmpty()) {
-                    txtID.setText("  DNI/NIE");
+                    txtID.setText("  ID");
                 }
             }
         });
-        txtPassword.addFocusListener(new java.awt.event.FocusAdapter() {
+        txtName.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
-                if (txtPassword.getText().equals("  Contraseña")) {
-                    txtPassword.setText("");
+                if (txtName.getText().equals("  Nombre")) {
+                    txtName.setText("");
                 }
             }
             public void focusLost(java.awt.event.FocusEvent evt) {
-                if (txtPassword.getText().isEmpty()) {
-                    txtPassword.setText("  Contraseña");
+                if (txtName.getText().isEmpty()) {
+                    txtName.setText("  Nombre");
                 }
             }
         });
     }
     private boolean validateLogin() {
         String dni = txtID.getText().trim();
-        String password = txtPassword.getText().trim();
-        if (dni.isEmpty() || dni.equals("  DNI/NIE")) {
+        String password = txtName.getText().trim();
+        if (dni.isEmpty() || dni.equals("  ID")) {
             JOptionPane.showMessageDialog(this, 
-                "El campo DNI/NIE está vacío. \nPor favor, introduce tu DNI/NIE.", 
+                "El campo ID está vacío. \nPor favor, introduce tu ID.", 
                 "Campo Vacío", 
                 JOptionPane.WARNING_MESSAGE);
             return false;
         }
-        if (password.isEmpty() || password.equals("  Contraseña")) {
+        if (password.isEmpty() || password.equals("  Nombre")) {
             JOptionPane.showMessageDialog(this, 
-                "El campo Contraseña está vacío. \nPor favor, introduce tu contraseña.", 
+                "El campo Nombre está vacío. \nPor favor, introduzca su nombre.", 
                 "Campo Vacío", 
                 JOptionPane.WARNING_MESSAGE);
             return false;
@@ -105,7 +110,7 @@ public class LoginGUI extends JFrame {
             Integer.parseInt(dni);
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(this, 
-                "El DNI/NIE debe ser un número válido.", 
+                "El ID debe ser un número válido.", 
                 "Error de Formato", 
                 JOptionPane.ERROR_MESSAGE);
             return false;

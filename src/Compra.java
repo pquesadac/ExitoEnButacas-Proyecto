@@ -108,6 +108,7 @@ public class Compra extends JDialog {
         btn_cancelar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 asientosGUI.liberarAsientosReservados();
+                timerReserva.stop();
                 dispose();
             }
         });

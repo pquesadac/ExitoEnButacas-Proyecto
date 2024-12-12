@@ -42,6 +42,7 @@ public class AsientosGUI extends JFrame {
     // Constructor
     public AsientosGUI(Sala sala, Usuario usuario) {
     	this.sala = sala;
+    	this.usuario = usuario;
         initComponents();
         jtAsientos.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         jtAsientos.setCellSelectionEnabled(true);
@@ -53,7 +54,7 @@ public class AsientosGUI extends JFrame {
     }
 
     private void configuracionTemporizadores() {
-        inicioPeliculaTimer = new Timer(20 * 1000, e -> {
+        inicioPeliculaTimer = new Timer(2 * 20 * 1000, e -> {
             JOptionPane.showMessageDialog(this, "La película ha comenzado. No se pueden comprar más asientos.");
             setInteraccion(false);
         });
@@ -225,6 +226,11 @@ public class AsientosGUI extends JFrame {
     }
 
     private void reservarAsiento() {
+        if (usuario == null || usuario.getId() == 0) { // Verifica si el usuario está autenticado
+            JOptionPane.showMessageDialog(this, "Debes iniciar sesión para reservar asientos.");
+            return;
+        }
+
         int cantidadSeleccionada = 0;
 
         for (int i = 0; i < jtAsientos.getRowCount(); i++) {
@@ -259,10 +265,6 @@ public class AsientosGUI extends JFrame {
     }
 
     public void marcarAsientosComoOcupados() {
-        Usuario usuario = new Usuario(); 
-        usuario.setId(1); // ID estático para pruebas
-        usuario.setNombre("Usuario Prueba");
-
         List<Asiento> asientosVendidos = new ArrayList<>();
 
         for (int row = 0; row < jtAsientos.getRowCount(); row++) {
@@ -275,7 +277,7 @@ public class AsientosGUI extends JFrame {
                     Asiento asiento = new Asiento();
                     asiento.setId(row * jtAsientos.getColumnCount() + col); // Genera un ID único para el asiento
                     asiento.setEstado(EstadoAsiento.VENDIDO);
-                    asiento.setUsuarioReservado(usuario);
+                    asiento.setUsuarioReservado(usuario); // Asocia al usuario actual
                     asientosVendidos.add(asiento);
                 }
             }

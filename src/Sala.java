@@ -117,10 +117,16 @@ public class Sala {
     public String iniciarRifa() {
         rifaEnCurso = true;
         List<Asiento> asientosVendidos = new ArrayList<>();
-        for (List<Asiento> listaAsientos : asientos.values()) {
+        Map<Asiento, Usuario> mapaAsientosUsuarios = new HashMap<>();
+
+        for (Map.Entry<Usuario, List<Asiento>> entry : asientos.entrySet()) {
+            Usuario usuario = entry.getKey();
+            List<Asiento> listaAsientos = entry.getValue();
+
             for (Asiento asiento : listaAsientos) {
                 if (asiento.getEstado() == EstadoAsiento.VENDIDO) {
                     asientosVendidos.add(asiento);
+                    mapaAsientosUsuarios.put(asiento, usuario);
                 }
             }
         }
@@ -133,9 +139,14 @@ public class Sala {
                 ganador2 = asientosVendidos.get(random.nextInt(asientosVendidos.size()));
             } while (ganador1.getId() == ganador2.getId());
 
+            Usuario usuarioGanador1 = mapaAsientosUsuarios.get(ganador1);
+            Usuario usuarioGanador2 = mapaAsientosUsuarios.get(ganador2);
+
             rifaEnCurso = false;
 
-            return "¡Enhorabuena, los asientos \"" + ganador1.getId() + "\" y \"" + ganador2.getId() + "\" han ganado!";
+            return "¡Enhorabuena! Los ganadores son:\n" +
+                   "Usuario: " + usuarioGanador1.getNombre() + " con el asiento \"" + ganador1.getId() + "\"\n" +
+                   "Usuario: " + usuarioGanador2.getNombre() + " con el asiento \"" + ganador2.getId() + "\"";
         } else {
             rifaEnCurso = false;
             return "No hay suficientes asientos vendidos para realizar la rifa.";
