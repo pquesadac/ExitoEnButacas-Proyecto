@@ -54,7 +54,7 @@ public class AsientosGUI extends JFrame {
     }
 
     private void configuracionTemporizadores() {
-        inicioPeliculaTimer = new Timer(2 * 20 * 1000, e -> {
+        inicioPeliculaTimer = new Timer(20 * 1000, e -> {
             JOptionPane.showMessageDialog(this, "La película ha comenzado. No se pueden comprar más asientos.");
             setInteraccion(false);
         });
@@ -305,4 +305,49 @@ public class AsientosGUI extends JFrame {
             }
         }
     }
+    
+ // En AsientosGUI.java
+    private void initializeRealTimeUpdates() {
+        Timer updateTimer = new Timer(1000, e -> {
+            actualizarEstadoAsientos();
+        });
+        updateTimer.start();
+    }
+
+    private void actualizarEstadoAsientos() {
+        for (int row = 0; row < jtAsientos.getRowCount(); row++) {
+            for (int col = 0; col < jtAsientos.getColumnCount(); col++) {
+                int asientoId = row * jtAsientos.getColumnCount() + col;
+                EstadoAsiento estado = obtenerEstadoAsiento(asientoId);
+                
+                switch (estado) {
+                    case LIBRE:
+                        jtAsientos.setValueAt(ASIENTO_LIBRE, row, col);
+                        break;
+                    case RESERVADO:
+                        jtAsientos.setValueAt(ASIENTO_RESERVADO, row, col);
+                        break;
+                    case VENDIDO:
+                        jtAsientos.setValueAt(ASIENTO_OCUPADO, row, col);
+                        break;
+                }
+            }
+        }
+    }
+
+    private EstadoAsiento obtenerEstadoAsiento(int asientoId) {
+        for (List<Asiento> asientosList : sala.getAsientos().values()) {
+            for (Asiento asiento : asientosList) {
+                if (asiento.getId() == asientoId) {
+                    return asiento.getEstado();
+                }
+            }
+        }
+        return EstadoAsiento.LIBRE;
+    }
 }
+
+/*Se puede seleccionar asientos que están ya vendidos si se selecciona junto con los que están libres*/
+/*En el ConcurrencyTest, podemos comprobar la concurrencia pero no en la interfaz, ¿cómo lo implementamos en la interfaz?*/
+/*Poner el nombre como campo obligatorio*/
+/*Comentar código*/

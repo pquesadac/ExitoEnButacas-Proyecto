@@ -1,10 +1,15 @@
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.Set;
+import java.util.HashSet;
 
 public class Sala {
     private ConcurrentHashMap<Usuario, List<Asiento>> asientos;
-    private boolean rifaEnCurso = false;
+    private final Object reservationLock = new Object();
+    private volatile boolean rifaEnCurso = false;
 
     // Constructor
     public Sala() {
@@ -19,49 +24,73 @@ public class Sala {
         this.asientos = asientos;
     }
 
-    public boolean reservarAsientos(Usuario usuario, List<Integer> idAsientos) {
+    public synchronized boolean reservarAsientos(Usuario usuario, List<Integer> idAsientos) {
         if (rifaEnCurso) {
             return false;
         }
 
-        List<Asiento> listaAsientosDisponibles = new ArrayList<>();
-        for (List<Asiento> listaAsientos : asientos.values()) {
-            for (Asiento asiento : listaAsientos) {
-                if (asiento.getEstado() != EstadoAsiento.LIBRE) {
+        synchronized (reservationLock) {
+            // First, verify all seats are available
+            Set<Integer> ocupados = new HashSet<>();
+            for (List<Asiento> asientosLista : asientos.values()) {
+                for (Asiento asiento : asientosLista) {
+                    if (asiento.getEstado() != EstadoAsiento.LIBRE) {
+                        ocupados.add(asiento.getId());
+                    }
+                }
+            }
+
+            // Check if any requested seat is already taken
+            for (Integer idAsiento : idAsientos) {
+                if (ocupados.contains(idAsiento)) {
                     return false;
                 }
-                listaAsientosDisponibles.add(asiento);
             }
-        }
 
-        for (Asiento asiento : listaAsientosDisponibles) {
-            asiento.setEstado(EstadoAsiento.RESERVADO);
-            asiento.setUsuarioReservado(usuario);
-            asiento.setTiempoReserva(LocalDateTime.now());
-        }
+            // All seats are available, proceed with reservation
+            List<Asiento> nuevosAsientos = new ArrayList<>();
+            for (Integer idAsiento : idAsientos) {
+                Asiento nuevoAsiento = new Asiento();
+                nuevoAsiento.setId(idAsiento);
+                nuevoAsiento.setEstado(EstadoAsiento.RESERVADO);
+                nuevoAsiento.setUsuarioReservado(usuario);
+                nuevoAsiento.setTiempoReserva(LocalDateTime.now());
+                nuevosAsientos.add(nuevoAsiento);
+            }
 
-        asientos.putIfAbsent(usuario, new ArrayList<>());
-        asientos.get(usuario).addAll(listaAsientosDisponibles);
-        return true;
+            // Use atomic operation to update the map
+            asientos.compute(usuario, (key, existingList) -> {
+                if (existingList == null) {
+                    return nuevosAsientos;
+                } else {
+                    existingList.addAll(nuevosAsientos);
+                    return existingList;
+                }
+            });
+
+            return true;
+        }
     }
 
-    public boolean comprarAsientos(Usuario usuario, int idAsientos) {
+    public boolean comprarAsientos(Usuario usuario, int idAsiento) {
         if (rifaEnCurso) {
             return false;
         }
 
-        List<Asiento> listaAsientos = asientos.get(usuario);
-        if (listaAsientos != null) {
-            for (Asiento asiento : listaAsientos) {
-                if (asiento.getId() == idAsientos) {
-                    if (asiento.getEstado() != EstadoAsiento.RESERVADO) {
+        synchronized (reservationLock) {
+            List<Asiento> listaAsientos = asientos.get(usuario);
+            if (listaAsientos != null) {
+                for (Asiento asiento : listaAsientos) {
+                    if (asiento.getId() == idAsiento && 
+                        asiento.getEstado() == EstadoAsiento.RESERVADO && 
+                        asiento.getUsuarioReservado().equals(usuario)) {
                         asiento.setEstado(EstadoAsiento.VENDIDO);
                         return true;
                     }
                 }
             }
+            return false;
         }
-        return false;
     }
 
     public boolean cancelarAsientos(Usuario usuario, int idAsientos) {
@@ -85,33 +114,23 @@ public class Sala {
         return false;
     }
 
-    public boolean timeoutReserva(Usuario usuario, int idAsientos) {
-        if (rifaEnCurso) {
-            return false;
-        }
-
-        List<Asiento> listaAsientos = asientos.get(usuario);
-        if (listaAsientos != null) {
-            for (Asiento asiento : listaAsientos) {
-                if (asiento.getId() == idAsientos && asiento.getEstado() != EstadoAsiento.RESERVADO) {
-                    new Thread(() -> {
-                        try {
-                            Thread.sleep(60000);
-                            if (asiento.getEstado() == EstadoAsiento.RESERVADO) {
-                                asiento.setEstado(EstadoAsiento.LIBRE);
-                                asiento.setTiempoReserva(null);
-                                asiento.setUsuarioReservado(null);
-                                System.out.println("Asiento " + idAsientos + " ya no está reservado");
-                            }
-                        } catch (Exception e) {
-                            System.out.println(e.getMessage());
-                        }
-                    }).start();
-                    return true;
+    public void timeoutReserva(Usuario usuario, int idAsiento) {
+        CompletableFuture.delayedExecutor(60, TimeUnit.SECONDS).execute(() -> {
+            synchronized (reservationLock) {
+                List<Asiento> listaAsientos = asientos.get(usuario);
+                if (listaAsientos != null) {
+                    listaAsientos.stream()
+                        .filter(asiento -> asiento.getId() == idAsiento && 
+                                         asiento.getEstado() == EstadoAsiento.RESERVADO)
+                        .findFirst()
+                        .ifPresent(asiento -> {
+                            asiento.setEstado(EstadoAsiento.LIBRE);
+                            asiento.setUsuarioReservado(null);
+                            asiento.setTiempoReserva(null);
+                        });
                 }
             }
-        }
-        return false;
+        });
     }
 
     public String iniciarRifa() {
