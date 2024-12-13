@@ -30,7 +30,6 @@ public class Sala {
         }
 
         synchronized (reservationLock) {
-            // First, verify all seats are available
             Set<Integer> ocupados = new HashSet<>();
             for (List<Asiento> asientosLista : asientos.values()) {
                 for (Asiento asiento : asientosLista) {
@@ -40,14 +39,12 @@ public class Sala {
                 }
             }
 
-            // Check if any requested seat is already taken
             for (Integer idAsiento : idAsientos) {
                 if (ocupados.contains(idAsiento)) {
                     return false;
                 }
             }
 
-            // All seats are available, proceed with reservation
             List<Asiento> nuevosAsientos = new ArrayList<>();
             for (Integer idAsiento : idAsientos) {
                 Asiento nuevoAsiento = new Asiento();
@@ -58,7 +55,6 @@ public class Sala {
                 nuevosAsientos.add(nuevoAsiento);
             }
 
-            // Use atomic operation to update the map
             asientos.compute(usuario, (key, existingList) -> {
                 if (existingList == null) {
                     return nuevosAsientos;

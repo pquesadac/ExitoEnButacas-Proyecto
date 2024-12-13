@@ -13,7 +13,8 @@ public class ConcurrencyTest {
     private static final int TIEMPO_ESPERA_ENTRE_INTENTOS = 500; // milisegundos
     
     public static void main(String[] args) {
-        Sala sala = new Sala();
+        Random random = new Random();
+    	Sala sala = new Sala();
         ExecutorService executorService = Executors.newFixedThreadPool(NUM_USUARIOS);
         CountDownLatch latch = new CountDownLatch(NUM_USUARIOS);
         
@@ -30,7 +31,6 @@ public class ConcurrencyTest {
                     
                     while (!compraCompleta && intentos < MAX_INTENTOS) {
                         intentos++;
-                        Random random = new Random();
                         List<Integer> asientosSeleccionados = new ArrayList<>();
                         
                         // Seleccionar asientos aleatorios
