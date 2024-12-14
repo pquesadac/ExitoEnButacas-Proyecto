@@ -23,7 +23,7 @@ import javax.swing.Timer;
 
 public class AsientosGUI extends JFrame {
 
-    private JButton jbCancelarReserva;
+    private JButton jbVolverAtras;
     private JButton jbReservar;
     private JScrollPane jspAsientos;
     private JTable jtAsientos;
@@ -41,14 +41,19 @@ public class AsientosGUI extends JFrame {
 
     // Constructor
     public AsientosGUI(Sala sala, Usuario usuario) {
-    	this.sala = sala;
-    	this.usuario = usuario;
+        this.sala = sala;
+        this.usuario = usuario;
         initComponents();
         jtAsientos.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         jtAsientos.setCellSelectionEnabled(true);
 
         jbReservar.addActionListener(e -> reservarAsiento());
-        jbCancelarReserva.addActionListener(e -> cancelarReserva());
+        jbVolverAtras.addActionListener(e -> {
+            LoginGUI loginGUI = new LoginGUI();
+            loginGUI.setVisible(true);
+
+            this.dispose(); 
+        });
         configuracionTemporizadores();
         setTitle("Selección de Asientos - " + usuario.getNombre());
     }
@@ -71,7 +76,7 @@ public class AsientosGUI extends JFrame {
         inicioPeliculaTimer.start();
         finPeliculaTimer.start();
     }
-    
+
     private void resetearAsientosOcupados() {
         for (int row = 0; row < jtAsientos.getRowCount(); row++) {
             for (int col = 0; col < jtAsientos.getColumnCount(); col++) {
@@ -83,22 +88,27 @@ public class AsientosGUI extends JFrame {
         }
     }
 
-    private void realizarRifa() {
-        String mensajeRifa = sala.iniciarRifa();
-        JOptionPane.showMessageDialog(this, mensajeRifa);
-    }
+   private void realizarRifa() {
+    String mensajeRifa = sala.iniciarRifa();
+    JOptionPane.showMessageDialog(this, mensajeRifa);
 
+    Timer cierreProgramaTimer = new Timer(5 * 1000, e -> {
+        System.exit(0); 
+    });
+    cierreProgramaTimer.setRepeats(false); 
+    cierreProgramaTimer.start();
+}
 
     private void setInteraccion(boolean habilitado) {
         jbReservar.setEnabled(habilitado);
-        jbCancelarReserva.setEnabled(habilitado);
+        jbVolverAtras.setEnabled(habilitado);
         jtAsientos.setEnabled(habilitado);
     }
 
     private void initComponents() {
         jspAsientos = new javax.swing.JScrollPane();
         jtAsientos = new JTable();
-        jbCancelarReserva = new javax.swing.JButton();
+        jbVolverAtras = new javax.swing.JButton();
         jbReservar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -177,7 +187,7 @@ public class AsientosGUI extends JFrame {
         jspAsientos.setViewportView(jtAsientos);
         jtAsientos.getTableHeader().setUI(null);
 
-        jbCancelarReserva.setText("Cancelar Compra");
+        jbVolverAtras.setText("Volver Atras");
 
         jbReservar.setText("Comprar");
 
@@ -190,7 +200,7 @@ public class AsientosGUI extends JFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(jspAsientos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jbCancelarReserva, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jbVolverAtras, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addComponent(jbReservar, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addContainerGap()
@@ -202,7 +212,7 @@ public class AsientosGUI extends JFrame {
                         .addComponent(jspAsientos, javax.swing.GroupLayout.DEFAULT_SIZE, 800, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(jbCancelarReserva)
+                                .addComponent(jbVolverAtras)
                                 .addComponent(jbReservar))
                         .addContainerGap()
         );
@@ -226,28 +236,60 @@ public class AsientosGUI extends JFrame {
     }
 
     private void reservarAsiento() {
-        if (usuario == null || usuario.getId() == 0) { // Verifica si el usuario está autenticado
-            JOptionPane.showMessageDialog(this, "Debes iniciar sesión para reservar asientos.");
-            return;
-        }
 
+        List<Integer> asientosAReservar = new ArrayList<>();
         int cantidadSeleccionada = 0;
+        boolean tieneAsientoOcupado = false;
 
+        // Primero, tenemos que verificar el estado de los asientos seleccionados
         for (int i = 0; i < jtAsientos.getRowCount(); i++) {
             for (int j = 0; j < jtAsientos.getColumnCount(); j++) {
                 if (jtAsientos.isCellSelected(i, j)) {
-                    if (jtAsientos.getValueAt(i, j) == ASIENTO_LIBRE) {
-                        jtAsientos.setValueAt(ASIENTO_RESERVADO, i, j);
+                    Object valorAsiento = jtAsientos.getValueAt(i, j);
+                    int idAsiento = i * jtAsientos.getColumnCount() + j;
+
+                    if (valorAsiento == ASIENTO_LIBRE) {
+                        asientosAReservar.add(idAsiento);
                         cantidadSeleccionada++;
+                    } else if (valorAsiento == ASIENTO_OCUPADO) {
+                        tieneAsientoOcupado = true;
+                        break;
                     }
                 }
             }
+
+            if (tieneAsientoOcupado) {
+                break;
+            }
         }
 
+        if (tieneAsientoOcupado) {
+            JOptionPane.showMessageDialog(this, "No puedes seleccionar asientos ya comprados.");
+            return;
+        }
+
+        // Si hay asientos libres, podemos seguir con la reserva
         if (cantidadSeleccionada > 0) {
-            Compra compra = new Compra(this);
-            compra.actualizarCantidadAsientos(cantidadSeleccionada);
-            compra.setVisible(true);
+            // Intentamos reservar los asientos en la Sala
+            boolean reservaExitosa = sala.reservarAsientos(usuario, asientosAReservar);
+
+            if (reservaExitosa) {
+                // Marcamos asientos como reservados en la interfaz
+                for (int i = 0; i < jtAsientos.getRowCount(); i++) {
+                    for (int j = 0; j < jtAsientos.getColumnCount(); j++) {
+                        int idAsiento = i * jtAsientos.getColumnCount() + j;
+                        if (asientosAReservar.contains(idAsiento)) {
+                            jtAsientos.setValueAt(ASIENTO_RESERVADO, i, j);
+                        }
+                    }
+                }
+
+                Compra compra = new Compra(this);
+                compra.actualizarCantidadAsientos(cantidadSeleccionada);
+                compra.setVisible(true);
+            } else {
+                JOptionPane.showMessageDialog(this, "No se pudieron reservar los asientos. Algunos ya están ocupados.");
+            }
         } else {
             JOptionPane.showMessageDialog(this, "Por favor, selecciona al menos un asiento.");
         }
@@ -292,21 +334,7 @@ public class AsientosGUI extends JFrame {
         this.ventanaCompra = ventanaCompra;
     }
 
-    private void cancelarReserva() {
-        int[] selectedRows = jtAsientos.getSelectedRows();
-        int[] selectedColumns = jtAsientos.getSelectedColumns();
-        for (int row : selectedRows) {
-            for (int col : selectedColumns) {
-                Object currentValue = jtAsientos.getValueAt(row, col);
-                if (currentValue instanceof ImageIcon && currentValue.equals(ASIENTO_OCUPADO)) {
-                    jtAsientos.setValueAt(ASIENTO_LIBRE, row, col);
-                    JOptionPane.showMessageDialog(rootPane, "Asientos cancelados. El dinero se ha enviado a tu cuenta.");
-                }
-            }
-        }
-    }
-    
- // En AsientosGUI.java
+    // En AsientosGUI.java
     private void initializeRealTimeUpdates() {
         Timer updateTimer = new Timer(1000, e -> {
             actualizarEstadoAsientos();
@@ -319,7 +347,7 @@ public class AsientosGUI extends JFrame {
             for (int col = 0; col < jtAsientos.getColumnCount(); col++) {
                 int asientoId = row * jtAsientos.getColumnCount() + col;
                 EstadoAsiento estado = obtenerEstadoAsiento(asientoId);
-                
+
                 switch (estado) {
                     case LIBRE:
                         jtAsientos.setValueAt(ASIENTO_LIBRE, row, col);
@@ -345,9 +373,6 @@ public class AsientosGUI extends JFrame {
         }
         return EstadoAsiento.LIBRE;
     }
+    
+    
 }
-
-/*Se puede seleccionar asientos que están ya vendidos si se selecciona junto con los que están libres*/
-/*En el ConcurrencyTest, podemos comprobar la concurrencia pero no en la interfaz, ¿cómo lo implementamos en la interfaz?*/
-/*Poner el nombre como campo obligatorio*/
-/*Comentar código*/
