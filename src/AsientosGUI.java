@@ -351,4 +351,3 @@ public class AsientosGUI extends JFrame {
 /*En el ConcurrencyTest, podemos comprobar la concurrencia pero no en la interfaz, ¿cómo lo implementamos en la interfaz?*/
 /*Poner el nombre como campo obligatorio*/
 /*Comentar código*/
-/*La rifa se puede hacer si hay como mín. 2 asientos. ¿Lo cambiamos a 3 asientos?*/

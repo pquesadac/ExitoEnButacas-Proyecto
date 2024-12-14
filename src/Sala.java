@@ -146,7 +146,7 @@ public class Sala {
             }
         }
 
-        if (asientosVendidos.size() >= 2) {
+        if (asientosVendidos.size() >= 3) {
             Random random = new Random();
             Asiento ganador1 = asientosVendidos.get(random.nextInt(asientosVendidos.size()));
             Asiento ganador2;
