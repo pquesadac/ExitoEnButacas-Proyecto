@@ -41,8 +41,8 @@ public class AsientosGUI extends JFrame {
 
     // Constructor
     public AsientosGUI(Sala sala, Usuario usuario) {
-    	this.sala = sala;
-    	this.usuario = usuario;
+        this.sala = sala;
+        this.usuario = usuario;
         initComponents();
         jtAsientos.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         jtAsientos.setCellSelectionEnabled(true);
@@ -75,7 +75,7 @@ public class AsientosGUI extends JFrame {
         inicioPeliculaTimer.start();
         finPeliculaTimer.start();
     }
-    
+
     private void resetearAsientosOcupados() {
         for (int row = 0; row < jtAsientos.getRowCount(); row++) {
             for (int col = 0; col < jtAsientos.getColumnCount(); col++) {
@@ -87,17 +87,16 @@ public class AsientosGUI extends JFrame {
         }
     }
 
-    private void realizarRifa() {
-        String mensajeRifa = sala.iniciarRifa();
-        JOptionPane.showMessageDialog(this, mensajeRifa);
+   private void realizarRifa() {
+    String mensajeRifa = sala.iniciarRifa();
+    JOptionPane.showMessageDialog(this, mensajeRifa);
 
-        Timer cierreProgramaTimer = new Timer(5 * 1000, e -> {
-            System.exit(0); 
-        });
-        cierreProgramaTimer.setRepeats(false); 
-        cierreProgramaTimer.start();
-    }
-
+    Timer cierreProgramaTimer = new Timer(5 * 1000, e -> {
+        System.exit(0); 
+    });
+    cierreProgramaTimer.setRepeats(false); 
+    cierreProgramaTimer.start();
+}
 
     private void setInteraccion(boolean habilitado) {
         jbReservar.setEnabled(habilitado);
@@ -236,17 +235,18 @@ public class AsientosGUI extends JFrame {
     }
 
     private void reservarAsiento() {
-    	List<Integer> asientosAReservar = new ArrayList<>();
+
+        List<Integer> asientosAReservar = new ArrayList<>();
         int cantidadSeleccionada = 0;
         boolean tieneAsientoOcupado = false;
 
         // Primero, tenemos que verificar el estado de los asientos seleccionados
-
         for (int i = 0; i < jtAsientos.getRowCount(); i++) {
             for (int j = 0; j < jtAsientos.getColumnCount(); j++) {
                 if (jtAsientos.isCellSelected(i, j)) {
-                	Object valorAsiento = jtAsientos.getValueAt(i, j);
+                    Object valorAsiento = jtAsientos.getValueAt(i, j);
                     int idAsiento = i * jtAsientos.getColumnCount() + j;
+
                     if (valorAsiento == ASIENTO_LIBRE) {
                         asientosAReservar.add(idAsiento);
                         cantidadSeleccionada++;
@@ -342,7 +342,7 @@ public class AsientosGUI extends JFrame {
             for (int col = 0; col < jtAsientos.getColumnCount(); col++) {
                 int asientoId = row * jtAsientos.getColumnCount() + col;
                 EstadoAsiento estado = obtenerEstadoAsiento(asientoId);
-                
+
                 switch (estado) {
                     case LIBRE:
                         jtAsientos.setValueAt(ASIENTO_LIBRE, row, col);
