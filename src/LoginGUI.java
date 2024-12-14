@@ -62,6 +62,7 @@ public class LoginGUI extends JFrame {
 
         addPlaceholderBehavior();
     }
+    
   private void addPlaceholderBehavior() {
         txtID.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
@@ -88,33 +89,33 @@ public class LoginGUI extends JFrame {
             }
         });
     }
-    private boolean validateLogin() {
-        String dni = txtID.getText().trim();
-        String password = txtName.getText().trim();
-        if (dni.isEmpty() || dni.equals("  ID")) {
-            JOptionPane.showMessageDialog(this, 
-                "El campo ID está vacío. \nPor favor, introduce tu ID.", 
-                "Campo Vacío", 
-                JOptionPane.WARNING_MESSAGE);
-            return false;
-        }
-        if (password.isEmpty() || password.equals("  Nombre")) {
-            JOptionPane.showMessageDialog(this, 
-                "El campo Nombre está vacío. \nPor favor, introduzca su nombre.", 
-                "Campo Vacío", 
-                JOptionPane.WARNING_MESSAGE);
-            return false;
-        }
-      
-        try {
-            Integer.parseInt(dni);
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, 
-                "El ID debe ser un número válido.", 
-                "Error de Formato", 
-                JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-        return true;
-    }
+  private boolean validateLogin() {
+	    String id = txtID.getText().trim();  
+	    String nombre = txtName.getText().trim(); 
+	    if (id.isEmpty() || id.equals("ID")) {
+	        JOptionPane.showMessageDialog(this,
+	            "El campo ID está vacío. \nPor favor, introduce tu ID.",
+	            "Campo Vacío",
+	            JOptionPane.WARNING_MESSAGE);
+	        return false;
+	    }
+	    if (nombre.isEmpty() || nombre.equals("Nombre")) {
+	        JOptionPane.showMessageDialog(this,
+	            "El campo Nombre está vacío. \nPor favor, introduce tu nombre.",
+	            "Campo Vacío",
+	            JOptionPane.WARNING_MESSAGE);
+	        return false;
+	    }
+  
+	  try {
+	      Integer.parseInt(id);
+	  } catch (NumberFormatException e) {
+	      JOptionPane.showMessageDialog(this,
+	          "El ID debe ser un número válido.",
+	          "Error de Formato",
+	          JOptionPane.ERROR_MESSAGE);
+	      return false;
+	  }
+	  return true;
+	}
 }
