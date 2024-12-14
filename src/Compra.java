@@ -115,9 +115,10 @@ public class Compra extends JDialog {
         JButton btn_cancelar = new JButton("Cancelar");
         btn_cancelar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                asientosGUI.liberarAsientosReservados();  // Libera los asientos reservados
-                timerReserva.stop(); // Detiene el temporizador.
-                dispose(); // Cierra la ventana de compra
+                // Liberar asientos reservados en la interfaz y en la lógica
+                asientosGUI.liberarAsientosReservados();
+                timerReserva.stop(); // Detener el temporizador
+                dispose(); // Cerrar la ventana de compra
             }
         });
         btn_cancelar.setActionCommand("Cancel");

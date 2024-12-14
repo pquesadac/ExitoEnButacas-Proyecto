@@ -1,7 +1,10 @@
 public class Main {
     public static void main(String[] args) {
+        // Creamos una instancia de la clase Sala.
         Sala sala = new Sala();
+        // Creamos una instancia de la interfaz gráfica del login.
         LoginGUI loginGUI = new LoginGUI();
+        // Se hace visible la ventana de inicio de sesión
         loginGUI.setVisible(true);
     }
 }
