@@ -2,14 +2,27 @@ import javax.swing.Timer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+/**
+ * Clase TimerReserva
+ * Gestiona un temporizador que libera asientos reservados automáticamente
+ * si no se completa la compra dentro de un tiempo límite definido.
+ */
 public class TimerReserva {
-    private Timer timer;
-    private AsientosGUI asientosGUI;
+    private Timer timer;    // Temporizador que controla el tiempo de reserva.
+    private AsientosGUI asientosGUI; // Referencia a la interfaz gráfica de los asientos.
     private Compra compra; // Referencia a la ventana de compra
 
+
+    /**
+     * Constructor de la clase TimerReserva.
+     * Referencia a la interfaz gráfica que gestiona los asientos.
+     * Tiempo límite en segundos para completar la compra antes
+     * de que los asientos reservados se liberen automáticamente.
+     */
     public TimerReserva(AsientosGUI asientosGUI, int delayInSeconds) {
         this.asientosGUI = asientosGUI;
 
+        // Inicializa el temporizador con el tiempo de espera especificado y define la acción al expirar.
         this.timer = new Timer(delayInSeconds * 1000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -17,7 +30,7 @@ public class TimerReserva {
                 resetReserva();
             }
         });
-        this.timer.setRepeats(false); // Solo ejecutar una vez
+        this.timer.setRepeats(false); // Solo se ejecuta una vez
     }
 
     // Asigna la ventana de compra
@@ -35,8 +48,12 @@ public class TimerReserva {
         timer.stop();
     }
 
-    // Resetear el estado de la reserva y cerrar la ventana de compra
-    private void resetReserva() {
+        /**
+        * Método privado que se ejecuta cuando el temporizador expira.
+        * Su funcionamiento es liberar los asientos reservados, cierra la ventana de compra (si está abierta)
+        * y vuelve a mostrar la ventana principal de selección de asientos.
+        */    
+        private void resetReserva() {
         asientosGUI.liberarAsientosReservados();
         if (compra != null) {
             compra.dispose(); // Cierra la ventana de compra
@@ -44,4 +61,3 @@ public class TimerReserva {
         asientosGUI.setVisible(true); 
     }
 }
-

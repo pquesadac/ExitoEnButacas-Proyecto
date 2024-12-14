@@ -1,9 +1,9 @@
 import java.time.LocalDateTime;
 
 public class Asiento {
-    private EstadoAsiento estado;
-    private int id;
-    private LocalDateTime tiempoReserva;
+    private EstadoAsiento estado; // Estado actual del asiento (libre, reservado, vendido)
+    private int id; // Identificador único del asiento.
+    private LocalDateTime tiempoReserva; // Tiempo exacto en el que se reservó el asiento.
     private Usuario usuarioReservado;
 
     public EstadoAsiento getEstado() {

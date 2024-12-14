@@ -20,12 +20,6 @@ public class ConcurrencyTest {
     
     private static final String[] NOMBRES_USUARIOS = {"Juanito", "Joselillo", "Olmo", "Maeb", "Alberto"};
 
-    /**
-     * Constructor para inicializar las interfaces.
-     *
-     * @param procesoCompraGUI La interfaz de usuarios.
-     * @param asientosGUI      La interfaz de asientos.
-     */
     public ConcurrencyTest(ProcesoCompra procesoCompraGUI, AsientosGUI asientosGUI) {
         this.procesoCompraGUI = procesoCompraGUI;
         this.asientosGUI = asientosGUI;
@@ -36,15 +30,18 @@ public class ConcurrencyTest {
         ExecutorService executorService = Executors.newFixedThreadPool(NUM_USUARIOS);
         CountDownLatch latch = new CountDownLatch(NUM_USUARIOS);
 
+        String[] nombresUsuarios = {"Juanito", "Joselillo", "Olmo", "Maeb", "Alberto"};
+
         for (int i = 0; i < NUM_USUARIOS; i++) {
             final int userId = i;
             executorService.submit(() -> {
                 try {
                     Usuario usuario = new Usuario();
                     usuario.setId(userId);
-                    usuario.setNombre(NOMBRES_USUARIOS[userId]); // Asignar nombres personalizados
+                    usuario.setNombre(nombresUsuarios[userId]);
 
                     boolean compraCompleta = false;
+                    boolean primeraIntentoCancelado = false; // Controla si Alberto ya canceló su compra
                     int intentos = 0;
                     List<Integer> asientosSeleccionados = new ArrayList<>();
 
@@ -54,21 +51,54 @@ public class ConcurrencyTest {
                     while (!compraCompleta && intentos < MAX_INTENTOS) {
                         intentos++;
                         asientosSeleccionados.clear();
+
+                        // Simular selección de asientos
                         int numAsientos = random.nextInt(MAX_ASIENTOS_POR_USUARIO - MIN_ASIENTOS_POR_USUARIO + 1) + MIN_ASIENTOS_POR_USUARIO;
                         for (int j = 0; j < numAsientos; j++) {
                             asientosSeleccionados.add(random.nextInt(120));
                         }
 
+                        // Cambiar estado a "comprando" (naranja)
                         procesoCompraGUI.actualizarEstadoUsuario(userId, "naranja");
-                        boolean reservaExitosa = sala.reservarAsientos(usuario, asientosSeleccionados);
+
+                        boolean reservaExitosa = false;
+
+                        // Forzar fallos para "Maeb" y flujo especial para "Alberto"
+                        if ("Maeb".equals(usuario.getNombre())) {
+                            reservaExitosa = false; // Siempre falla para Maeb
+                        } else if ("Alberto".equals(usuario.getNombre()) && !primeraIntentoCancelado) {
+                            // Simular que Alberto cancela su compra después de intentar
+                            reservaExitosa = sala.reservarAsientos(usuario, asientosSeleccionados);
+                            if (reservaExitosa) {
+                                // Actualizar asientos como reservados
+                                asientosSeleccionados.forEach(asientoId -> asientosGUI.actualizarAsiento(asientoId, EstadoAsiento.RESERVADO));
+
+                                // Simular cancelación
+                                Thread.sleep(TIEMPO_ESPERA_COMPRANDO);
+                                asientosSeleccionados.forEach(asientoId -> {
+                                    sala.cancelarAsientos(usuario, asientoId);
+                                    asientosGUI.actualizarAsiento(asientoId, EstadoAsiento.LIBRE);
+                                });
+
+                                procesoCompraGUI.actualizarEstadoUsuario(userId, "verde"); // Volver al estado inicial
+                                primeraIntentoCancelado = true; // Marca que ya canceló su primera compra
+                                Thread.sleep(TIEMPO_ESPERA_ENTRE_INTENTOS);
+                                continue; // Reinicia el ciclo
+                            }
+                        } else {
+                            reservaExitosa = sala.reservarAsientos(usuario, asientosSeleccionados);
+                        }
 
                         if (reservaExitosa) {
                             asientosSeleccionados.forEach(asientoId -> asientosGUI.actualizarAsiento(asientoId, EstadoAsiento.RESERVADO));
                             Thread.sleep(TIEMPO_ESPERA_COMPRANDO);
 
                             boolean todosComprados = true;
+
+                            // Intentar comprar los asientos reservados
                             for (Integer asientoId : asientosSeleccionados) {
                                 boolean compraExitosa = sala.comprarAsientos(usuario, asientoId);
+
                                 if (!compraExitosa) {
                                     todosComprados = false;
                                     asientosGUI.actualizarAsiento(asientoId, EstadoAsiento.LIBRE);
@@ -90,8 +120,10 @@ public class ConcurrencyTest {
                         }
                     }
 
-                    if (!compraCompleta) {
+                    // Si no se logró completar la compra después de 10 intentos
+                    if (!compraCompleta && !"Alberto".equals(usuario.getNombre())) {
                         procesoCompraGUI.actualizarEstadoUsuario(userId, "morado");
+                        procesoCompraGUI.actualizarAsientosComprados(userId, new ArrayList<>()); // Mostrar que no compró ningún asiento
                     }
 
                 } catch (InterruptedException e) {
@@ -110,7 +142,7 @@ public class ConcurrencyTest {
         } finally {
             executorService.shutdown();
         }
-
     }
+
 }
 

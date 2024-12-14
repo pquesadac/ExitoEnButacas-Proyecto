@@ -1,13 +1,10 @@
-import java.awt.EventQueue;
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
-
 import java.awt.*;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.List;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 
 public class ProcesoCompra extends JFrame {
 
@@ -18,7 +15,7 @@ public class ProcesoCompra extends JFrame {
     private static final String FS = File.separator;
     private static final ImageIcon ICONO_USUARIO = new ImageIcon("." + FS + "assets" + FS + "usuario_icono.jpg");
 
-    public ProcesoCompra() {
+    public ProcesoCompra(String[] nombresUsuarios) {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 600, 450);
         contentPane = new JPanel();
@@ -30,11 +27,20 @@ public class ProcesoCompra extends JFrame {
         panelesUsuarios = new HashMap<>();
         etiquetasAsientos = new HashMap<>();
 
+        JLabel titulo = new JLabel("Usuarios:");
+        titulo.setFont(new Font("Arial Rounded MT Bold", Font.BOLD, 24));
+        titulo.setHorizontalAlignment(SwingConstants.CENTER);
+        titulo.setBounds(50, 20, 500, 30); // Posición y tamaño del título
+        contentPane.add(titulo);
+        
         // Crear etiquetas y paneles para los usuarios
-        for (int i = 0; i < 5; i++) {
-            JLabel lblUsuario = new JLabel("Usuario " + (i + 1));
+        for (int i = 0; i < nombresUsuarios.length; i++) {
+        	JLabel lblUsuario = new JLabel(nombresUsuarios[i]);
             lblUsuario.setFont(new Font("Arial Rounded MT Bold", Font.BOLD, 20));
-            lblUsuario.setBounds(85, 105 + (50 * i), 130, 25);
+            lblUsuario.setIcon(escalaIcono(ICONO_USUARIO, 40, 30)); // Añade el ícono con escala
+            lblUsuario.setHorizontalTextPosition(SwingConstants.RIGHT); // Texto a la derecha del ícono
+            lblUsuario.setIconTextGap(10); // Espacio entre ícono y texto
+            lblUsuario.setBounds(50, 105 + (50 * i), 180, 35); // Ajustar posición
             contentPane.add(lblUsuario);
 
             JPanel panelEstado = new JPanel();
@@ -64,51 +70,40 @@ public class ProcesoCompra extends JFrame {
         contentPane.add(pnlVerde);
 
         JLabel lblVerde = new JLabel("Sin comprar");
-        lblVerde.setBounds(72, 368, 74, 13);
+        lblVerde.setBounds(72, 368, 80, 13);
         contentPane.add(lblVerde);
 
         JPanel pnlNaranja = new JPanel();
         pnlNaranja.setBorder(new LineBorder(new Color(0, 0, 0)));
         pnlNaranja.setBackground(new Color(255, 165, 0));
-        pnlNaranja.setBounds(180, 369, 12, 12);
+        pnlNaranja.setBounds(175, 369, 12, 12);
         contentPane.add(pnlNaranja);
 
         JLabel lblNaranja = new JLabel("Comprando...");
-        lblNaranja.setBounds(202, 368, 84, 13);
+        lblNaranja.setBounds(197, 368, 93, 13);
         contentPane.add(lblNaranja);
 
         JPanel pnlRojo = new JPanel();
         pnlRojo.setBorder(new LineBorder(new Color(0, 0, 0)));
         pnlRojo.setBackground(new Color(255, 0, 0));
-        pnlRojo.setBounds(310, 369, 12, 12);
+        pnlRojo.setBounds(300, 369, 12, 12);
         contentPane.add(pnlRojo);
 
         JLabel lblRojo = new JLabel("Comprado");
-        lblRojo.setBounds(332, 368, 74, 13);
+        lblRojo.setBounds(322, 368, 66, 13);
         contentPane.add(lblRojo);
+        
+        JPanel pnlMorado = new JPanel();
+        pnlMorado.setBorder(new LineBorder(new Color(0, 0, 0)));
+        pnlMorado.setBackground(new Color(147, 112, 219));
+        pnlMorado.setBounds(425, 369, 12, 12);
+        contentPane.add(pnlMorado);
+        
+        JLabel lblRendido = new JLabel("Rendido");
+        lblRendido.setBounds(447, 368, 74, 13);
+        contentPane.add(lblRendido);
     }
 
-    /**
-     * Actualiza los IDs de los asientos comprados de un usuario.
-     *
-     * @param userId             ID del usuario (0-4).
-     * @param asientosComprados  Lista de IDs de los asientos comprados.
-     */
-    public void actualizarAsientosComprados(int userId, List<Integer> asientosComprados) {
-        JLabel etiqueta = etiquetasAsientos.get(userId);
-        if (etiqueta != null) {
-            String asientosTexto = asientosComprados.isEmpty() ? "Asientos: Ninguno" : "Asientos: " + asientosComprados.toString();
-            etiqueta.setText(asientosTexto);
-            repaint();
-        }
-    }
-
-    /**
-     * Actualiza el estado visual de un usuario.
-     *
-     * @param userId ID del usuario (0-4).
-     * @param estado Estado: "verde", "naranja", "rojo", "morado".
-     */
     public void actualizarEstadoUsuario(int userId, String estado) {
         JPanel panel = panelesUsuarios.get(userId);
         if (panel != null) {
@@ -126,8 +121,26 @@ public class ProcesoCompra extends JFrame {
                     panel.setBackground(new Color(123, 104, 238));
                     break;
             }
-            panel.setVisible(true); // Mostrar el panel al actualizar el estado
+            panel.setVisible(true);
             repaint();
         }
+    }
+
+    public void actualizarAsientosComprados(int userId, java.util.List<Integer> asientosComprados) {
+        JLabel etiqueta = etiquetasAsientos.get(userId);
+        if (etiqueta != null) {
+            // Mostrar mensaje apropiado si no hay asientos comprados
+            String asientosTexto = asientosComprados == null || asientosComprados.isEmpty() 
+                    ? "Asientos: No compró ningún asiento" 
+                    : "Asientos: " + asientosComprados.toString();
+            etiqueta.setText(asientosTexto);
+            repaint();
+        }
+    }
+    
+    private ImageIcon escalaIcono(ImageIcon icono, int ancho, int alto) {
+        Image imagen = icono.getImage();
+        Image imagenEscalada = imagen.getScaledInstance(ancho, alto, Image.SCALE_SMOOTH);
+        return new ImageIcon(imagenEscalada);
     }
 }
