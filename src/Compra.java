@@ -17,26 +17,32 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.SwingConstants;
 
+/**
+ * Clase Compra
+ * Representa la ventana de compra dentro del sistema de reservas de asientos. 
+ * Permite al usuario realizar el pago de los asientos seleccionados o cancelar la operación.
+ */
+
 public class Compra extends JDialog {
 
     private static final long serialVersionUID = 1L;
-    private JPanel contentPanel = new JPanel();
-    private JTextField txt_precio; 
+    private JPanel contentPanel = new JPanel(); //Pagina principal para todos los componentes
+    private JTextField txt_precio; // Campo de texto que muestra el precio total de los asientos seleccionados.
     private JPanel panel;
-    private AsientosGUI asientosGUI;
-    private int cantidad_asientos = 0; 
-    private double precio_total = 0.0; 
-    private final int precio_asiento = 5; 
-    private JLabel lblCantidadAsientos;
+    private AsientosGUI asientosGUI; // Referencia a la interfaz de gestión de asientos.
+    private int cantidad_asientos = 0; // Cantidad de asientos seleccionados por el usuario.
+    private double precio_total = 0.0; // Precio total de la compra.
+    private final int precio_asiento = 5; // Precio fijo por cada asiento.
+    private JLabel lblCantidadAsientos; // Etiqueta que muestra la cantidad de asientos seleccionados
 
-    private TimerReserva timerReserva;
+    private TimerReserva timerReserva; // Temporizador para liberar los asientos si no se completa la compra.
 
-    private static final String FS = File.separator;
-    private static final ImageIcon CARRITO = new ImageIcon("." + FS + "assets" + FS + "carrito.png");
+    private static final String FS = File.separator; // Separador de archivos según el sistema operativo.
 
     public Compra(AsientosGUI asientosGUI) {
         this.asientosGUI = asientosGUI;
 
+    // Configuración del temporizador 
         this.timerReserva = new TimerReserva(asientosGUI, 3); // Cambiar segundos 
         this.timerReserva.setCompra(this); // Asignar la referencia de esta ventana
         this.timerReserva.start(); // Iniciar temporizador al abrir la ventana
@@ -50,7 +56,6 @@ public class Compra extends JDialog {
 
         JLabel imageLabel = new JLabel();
         imageLabel.setBounds(210, 54, 100, 100);
-        imageLabel.setIcon(CARRITO);
         contentPanel.add(imageLabel);
 
         JLabel lblCesta = new JLabel("C E S T A");
@@ -65,8 +70,10 @@ public class Compra extends JDialog {
         contentPanel.add(lblCantidadAsientos);
         lblCantidadAsientos.setFont(new Font("Book Antiqua", Font.PLAIN, 16));
 
+        // Calcula el precio total inicial.
         precio_total = cantidad_asientos * precio_asiento; 
         
+        // Campo de texto para mostrar el precio total.
         txt_precio = new JTextField(String.valueOf(precio_total) + " €");
         txt_precio.setEditable(false);
         txt_precio.setFont(new Font("Book Antiqua", Font.PLAIN, 16));
@@ -77,7 +84,7 @@ public class Compra extends JDialog {
         panel.setBackground(SystemColor.inactiveCaption);
         panel.setBounds(31, 181, 450, 27);
         contentPanel.add(panel);
-
+    
         JLabel lblAsientos = new JLabel("Asientos:");
         lblAsientos.setFont(new Font("Serif", Font.PLAIN, 12));
         lblAsientos.setBounds(31, 158, 134, 13);
@@ -93,28 +100,31 @@ public class Compra extends JDialog {
         buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
         getContentPane().add(buttonPane, BorderLayout.SOUTH);
 
+        // Botón para confirmar el pago.
         JButton btn_pagar = new JButton("Pagar");
         btn_pagar.setActionCommand("OK");
         btn_pagar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                asientosGUI.marcarAsientosComoOcupados();
-                dispose();
+                asientosGUI.marcarAsientosComoOcupados();   // Marca los asientos como ocupados.
+                dispose(); // Cierra la ventana de compra
             }
         });
         buttonPane.add(btn_pagar);
         getRootPane().setDefaultButton(btn_pagar);
 
+        // Botón para cancelar la compra.
         JButton btn_cancelar = new JButton("Cancelar");
         btn_cancelar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                asientosGUI.liberarAsientosReservados();
-                timerReserva.stop();
-                dispose();
+                asientosGUI.liberarAsientosReservados();  // Libera los asientos reservados
+                timerReserva.stop(); // Detiene el temporizador.
+                dispose(); // Cierra la ventana de compra
             }
         });
         btn_cancelar.setActionCommand("Cancel");
         buttonPane.add(btn_cancelar);
     }
+
 
     // Método para actualizar la cantidad de asientos y el total
    public void actualizarCantidadAsientos(int cantidad) {
