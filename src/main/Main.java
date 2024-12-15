@@ -15,15 +15,18 @@ import view.ProcesoCompra;
 import controller.Sala;
 import view.LoginGUI;
 
-/*public class Main {
+public class Main {
     public static void main(String[] args) {
+        // Creamos una instancia de la clase Sala.
         Sala sala = new Sala();
+        // Creamos una instancia de la interfaz gráfica del login.
         LoginGUI loginGUI = new LoginGUI();
+        // Se hace visible la ventana de inicio de sesión
         loginGUI.setVisible(true);
     }
-}*/
+}
 
-public class Main {
+/*public class Main {
     public static void main(String[] args) {
         // Crear la sala y el usuario principal
         Sala sala = new Sala();
@@ -54,4 +57,4 @@ public class Main {
         ConcurrencyTest concurrencyTest = new ConcurrencyTest(procesoCompraGUI, asientosGUI);
         concurrencyTest.iniciarTestConcurrencia(sala);
     }
-}
+}*/

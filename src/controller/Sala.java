@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.Set;
 import java.util.HashSet;
 
+// Clase Sala que gestiona las operaciones relacionadas con los asientos, reservas, compras y rifas
 public class Sala {
 
     // Mapa que asocia un usuario a una lista de asientos reservados

@@ -31,7 +31,7 @@ public class LoginGUI extends JFrame {
 
     public LoginGUI() {
     	this.sala = new Sala();
-    
+    	
      // Configuración de la ventana principal
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 420, 475);
@@ -87,7 +87,6 @@ public class LoginGUI extends JFrame {
 
         addPlaceholderBehavior();
     }
-
 
     
  // Método que maneja el comportamiento de los placeholders en los campos de texto

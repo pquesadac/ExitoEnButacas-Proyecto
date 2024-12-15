@@ -1,11 +1,3 @@
-/**
- * Interfaz gráfica principal para la selección y compra de asientos.
- * Muestra un mapa de la sala con el estado actual de cada asiento (libre, reservado, ocupado).
- * Permite al usuario realizar acciones como reservar o cancelar reservas.
- */
-
-package view;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,12 +6,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
-
-import controller.Sala;
-import model.Asiento;
-import model.EstadoAsiento;
-import model.Usuario;
-
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
@@ -34,11 +20,10 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import javax.swing.ListSelectionModel;
 import javax.swing.Timer;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.GroupLayout;
-import javax.swing.LayoutStyle.ComponentPlacement;
 
 public class AsientosGUI extends JFrame {
+
+	private JButton jbVolverAtras;
     private JButton jbReservar;
     private JScrollPane jspAsientos;
     private JTable jtAsientos;
@@ -74,6 +59,15 @@ public class AsientosGUI extends JFrame {
         // Configura el botón "Reservar". Cuando se haga clic, se ejecutará el método "reservarAsiento".
         jbReservar.addActionListener(e -> reservarAsiento());
 
+        // Configura el botón "Volver Atrás". Cuando se haga clic:
+        // 1. Se abrirá la ventana de inicio de sesión (LoginGUI).
+        // 2. Se cerrará la ventana actual.
+        jbVolverAtras.addActionListener(e -> {
+            LoginGUI loginGUI = new LoginGUI(); // Crea una nueva ventana de inicio de sesión.
+            loginGUI.setVisible(true);          // La muestra al usuario.
+            this.dispose();                     // Cierra la ventana actual.
+        });
+
         // Configura los temporizadores que controlan eventos como el inicio y el fin de la película.
         configuracionTemporizadores();
 
@@ -84,7 +78,8 @@ public class AsientosGUI extends JFrame {
     private void initComponents() {
         // Creamos los componentes principales de la ventana
         jspAsientos = new javax.swing.JScrollPane(); // Área desplazable donde pondremos la tabla de asientos
-        jtAsientos = new JTable();
+        jtAsientos = new JTable(); // La tabla donde se mostrarán los asientos
+        jbVolverAtras = new javax.swing.JButton(); // Botón para volver al menú anterior
         jbReservar = new javax.swing.JButton(); // Botón para realizar la compra de asientos
 
         // Configuración básica para cerrar la ventana
@@ -174,30 +169,40 @@ public class AsientosGUI extends JFrame {
 
         // Asignamos la tabla al área desplazable (scroll pane)
         jspAsientos.setViewportView(jtAsientos);
-        jtAsientos.getTableHeader().setUI(null);
+        jtAsientos.getTableHeader().setUI(null); // Quitamos el encabezado de la tabla (porque no necesitamos títulos)
+
+        // Configuramos el texto de los botones
+        jbVolverAtras.setText("Volver Atrás"); // Botón para volver a la pantalla anterior
         jbReservar.setText("Comprar"); // Botón para comprar los asientos seleccionados
 
         // Creamos un diseño para organizar los componentes dentro de la ventana
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        layout.setHorizontalGroup(
-        	layout.createParallelGroup(Alignment.LEADING)
-        		.addGroup(layout.createSequentialGroup()
-        			.addContainerGap()
-        			.addGroup(layout.createParallelGroup(Alignment.LEADING)
-        				.addComponent(jbReservar, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 806, Short.MAX_VALUE)
-        				.addComponent(jspAsientos, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 806, Short.MAX_VALUE))
-        			.addContainerGap())
-        );
-        layout.setVerticalGroup(
-        	layout.createParallelGroup(Alignment.LEADING)
-        		.addGroup(layout.createSequentialGroup()
-        			.addContainerGap()
-        			.addComponent(jspAsientos, GroupLayout.DEFAULT_SIZE, 798, Short.MAX_VALUE)
-        			.addPreferredGap(ComponentPlacement.RELATED)
-        			.addComponent(jbReservar)
-        			.addContainerGap())
-        );
         getContentPane().setLayout(layout);
+
+        // Organizamos los componentes horizontalmente
+        layout.setHorizontalGroup(
+            layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jspAsientos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE) // Tabla de asientos
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jbVolverAtras, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE) // Botón "Volver Atrás"
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jbReservar, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE))) // Botón "Comprar"
+                .addContainerGap()
+        );
+
+        // Organizamos los componentes verticalmente
+        layout.setVerticalGroup(
+            layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jspAsientos, javax.swing.GroupLayout.DEFAULT_SIZE, 800, Short.MAX_VALUE) // Tabla de asientos
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jbVolverAtras) // Botón "Volver Atrás"
+                    .addComponent(jbReservar)) // Botón "Comprar"
+                .addContainerGap()
+        );
 
         // Ajustamos la ventana al contenido
         pack();
@@ -427,14 +432,16 @@ public class AsientosGUI extends JFrame {
         return EstadoAsiento.LIBRE; // Si no encontramos el asiento, asumimos que está libre
     }
 
-    // Método para ocultar el botón de "Reservar"
+    // Método para ocultar los botones de "Reservar" y "Volver atrás"
     public void ocultarBotones() {
         jbReservar.setVisible(false); // Oculta el botón de "Reservar"
+        jbVolverAtras.setVisible(false); // Oculta el botón de "Volver Atrás"
     }
 
     // Método para habilitar o deshabilitar la interacción con los botones y la tabla de asientos
     private void setInteraccion(boolean habilitado) {
-        jbReservar.setEnabled(habilitado);
+        jbReservar.setEnabled(habilitado); // Activa o desactiva el botón de "Reservar"
+        jbVolverAtras.setEnabled(habilitado); // Activa o desactiva el botón de "Volver Atrás"
         jtAsientos.setEnabled(habilitado); // Activa o desactiva la selección de asientos en la tabla
     }
 
