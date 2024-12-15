@@ -1,4 +1,16 @@
+/**
+ * Clase que gestiona un temporizador para las reservas de asientos.
+ * Si un usuario no completa la compra dentro del tiempo límite, 
+ * los asientos reservados se liberan automáticamente.
+ */
+
+package controller;
+
 import javax.swing.Timer;
+
+import view.AsientosGUI;
+import view.Compra;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 

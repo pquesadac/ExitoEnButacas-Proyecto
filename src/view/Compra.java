@@ -1,3 +1,13 @@
+/**
+ * Ventana de compra que muestra el resumen de los asientos seleccionados.
+ * Permite al usuario completar el pago o cancelar la operación.
+ * Si no se realiza la compra dentro del tiempo límite, los asientos se liberan automáticamente.
+ */
+
+package view;
+
+import controller.TimerReserva;
+
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 
@@ -115,9 +125,10 @@ public class Compra extends JDialog {
         JButton btn_cancelar = new JButton("Cancelar");
         btn_cancelar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                asientosGUI.liberarAsientosReservados();  // Libera los asientos reservados
-                timerReserva.stop(); // Detiene el temporizador.
-                dispose(); // Cierra la ventana de compra
+                // Liberar asientos reservados en la interfaz y en la lógica
+                asientosGUI.liberarAsientosReservados();
+                timerReserva.stop(); // Detener el temporizador
+                dispose(); // Cerrar la ventana de compra
             }
         });
         btn_cancelar.setActionCommand("Cancel");

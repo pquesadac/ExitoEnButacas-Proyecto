@@ -1,3 +1,11 @@
+/**
+ * Clase que representa a un usuario dentro del sistema.
+ * Incluye un identificador único y un nombre. 
+ * Los usuarios pueden realizar acciones como reservar o comprar asientos.
+ */
+
+package model;
+
 import java.util.Objects;
 
 /**

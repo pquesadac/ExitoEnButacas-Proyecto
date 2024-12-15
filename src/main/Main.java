@@ -1,12 +1,29 @@
-public class Main {
+/**
+ * Clase principal que inicia la aplicación.
+ * Configura la sala y muestra la interfaz inicial de inicio de sesión (LoginGUI). => Main sin comentar
+ * Muestra la concurrencia de la aplicacion => Main comentado
+ */
+
+package main;
+
+import controller.ConcurrencyTest;
+import controller.Sala;
+import model.Usuario;
+import view.AsientosGUI;
+import view.ProcesoCompra;
+
+import controller.Sala;
+import view.LoginGUI;
+
+/*public class Main {
     public static void main(String[] args) {
         Sala sala = new Sala();
         LoginGUI loginGUI = new LoginGUI();
         loginGUI.setVisible(true);
     }
-}
+}*/
 
-/*public class Main {
+public class Main {
     public static void main(String[] args) {
         // Crear la sala y el usuario principal
         Sala sala = new Sala();
@@ -37,4 +54,4 @@ public class Main {
         ConcurrencyTest concurrencyTest = new ConcurrencyTest(procesoCompraGUI, asientosGUI);
         concurrencyTest.iniciarTestConcurrencia(sala);
     }
-}*/
+}

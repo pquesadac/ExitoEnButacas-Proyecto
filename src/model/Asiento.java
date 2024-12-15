@@ -1,3 +1,11 @@
+/**
+ * Clase que representa un asiento dentro del sistema.
+ * Cada asiento tiene un estado (libre, reservado, vendido), un identificador único,
+ * el usuario asociado a su reserva y un tiempo de reserva.
+ */
+
+package model;
+
 import java.time.LocalDateTime;
 
 public class Asiento {
